@@ -21,6 +21,10 @@ class RahmanEnvironment(flow.environment.TorqueEnvironment):
     cores_per_node = 16
 
     @classmethod
+    def mpi_cmd(cls, cmd, np):
+        return 'mpirun -np {np} {cmd}'.format(np=np, cmd=cmd)
+
+    @classmethod
     def script(cls, _id, nn, walltime, ppn=None, **kwargs):
         if ppn is None:
             ppn = cls.cores_per_node

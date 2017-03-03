@@ -3,8 +3,8 @@
 import argparse
 from multiprocessing import Pool
 
-from .project import get_project
-from .environment import get_environment
+from project import get_project
+from environment import get_environment
 
 
 def main(args):

@@ -45,7 +45,7 @@ class MyProject(FlowProject):
         np_total = np if serial else np * len(operations)
         # Calculate the total number of required nodes
         nn = ceil(np_total / ppn)
-
+        
         if not force:  # Perform basic check concerning the node utilization.
             usage = np * len(operations) / nn / ppn
             if usage < 0.9:

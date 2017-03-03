@@ -66,7 +66,7 @@ def sample(job):
 
 def auto(job):
     "This is a meta-operation to execute multiple operations."
-    from my_project import get_project
+    from my_project.project import get_project
     project = get_project()
     logger.info("Running meta operation 'auto' for job '{}'.".format(job))
     for i in range(10):
