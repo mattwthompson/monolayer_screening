@@ -4,8 +4,6 @@ The environments defined in this module can be auto-detected.
 This helps to define environment specific behaviour in heterogenous
 environments.
 """
-import logging
-
 import flow
 from flow.environment import get_environment
 from flow.environment import format_timedelta
@@ -13,16 +11,20 @@ from flow.environment import format_timedelta
 
 __all__ = ['get_environment']
 
-logger = logging.getLogger(__name__)
-
 
 class RahmanEnvironment(flow.environment.TorqueEnvironment):
     hostname_pattern = 'master.cl.vanderbilt.edu'
     cores_per_node = 16
 
     @classmethod
-    def mpi_cmd(cls, cmd, np):
-        return 'mpirun -np {np} {cmd}'.format(np=np, cmd=cmd)
+    def grompp_cmd(cls, stage, _id):
+        return ('gmx grompp -f {stage}.mdp -c {name}.gro -p {name}.top'
+               '-n {name}.ndx -o {stage}.tpr'.format(stage=stage, name=_id))
+
+    @classmethod
+    def run_cmd(cls, stage):
+        return 'gmx mdrun -v -deffnm {stage} -ntmpi {cpn}'.format(stage=stage,
+                                                                  cpn=cores_per_node)
 
     @classmethod
     def script(cls, _id, nn, walltime, ppn=None, **kwargs):

@@ -12,32 +12,24 @@ import numpy as np
 
 
 def main(args, random_seed):
-    project = signac.init_project('MyProject')
+    project = signac.init_project('MonolayerScreeningProject')
     statepoints_init = []
     for replication_index in range(args.num_replicas):
-        for p in np.linspace(0.5, 5.0, 10):
-            statepoint = dict(
-                    # system size
-                    N=512,
-
-                    # Lennard-Jones potential parameters
-                    sigma=1.0,
-                    epsilon=1.0,
-                    r_cut=2.5,
-
-                    # random seed
-                    seed=random_seed*(replication_index + 1),
-
-                    # thermal energy
-                    kT=1.0,
-                    # presure
-                    p=p,
-                    # thermostat coupling constant
-                    tau=1.0,
-                    # barostat coupling constant
-                    tauP=1.0)
-            project.open_job(statepoint).init()
-            statepoints_init.append(statepoint)
+        for terminal_group in ['aldehyde', 'cyclopropyl', 'nitro']:
+            for chainlength in np.linspace(6, 18, 3):
+                statepoint = dict(
+                        # carbon backbone length
+                        chainlength = chainlength,
+                        # number of monolayer chains
+                        n=100,
+                        # random seed
+                        seed=random_seed*(replication_index + 1),
+                        # surface type
+                        surface='SilicaInterface',
+                        # terminal group
+                        terminal_group = terminal_group)
+                project.open_job(statepoint).init()
+                statepoints_init.append(statepoint)
 
     # Writing statpoints to hash table as backup
     project.write_statepoints(statepoints_init)

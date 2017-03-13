@@ -4,43 +4,28 @@ from math import ceil
 from flow import FlowProject
 from flow import JobOperation
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 
 class MyProject(FlowProject):
 
     def classify(self, job):
-        "Classify this job by yielding 'labels' based on the job's status."
-        num_steps = job.document.get('sample_step', 0)
-        if job.isfile('init.gsd'):
+        if job.isfile('init.top'):
             yield 'initialized'
-        if 'volume_estimate' in job.document:
-            yield 'estimated'
-        if num_steps > 0:
-            yield 'started'
-        if num_steps >= 5000 and job.isfile('dump.log'):
-            yield 'sampled'
+        if job.isfile('nvt.tpr'):
+            yield 'minimized'
 
     def next_operation(self, job):
-        "Determine the next job, based on the job's data."
         labels = set(self.classify(job))
 
         def op(name):
-            "Construct default job operation."
             return JobOperation(name, job, 'python scripts/run.py {} {}'.format(name, job))
 
         if 'initialized' not in labels:
             return op('initialize')
-        if 'estimated' not in labels:
-            return op('estimate')
-        if 'sampled' not in labels:
-            return op('sample')
+        if 'minimized' not in labels:
+            return op('minimize')
 
     def submit_user(self, env, _id, operations, walltime, np, ppn,
                     serial=False, force=False, **kwargs):
-        "Write commands for operations to job script."
         # Calculate the total number of required processors
         np_total = np if serial else np * len(operations)
         # Calculate the total number of required nodes
@@ -61,12 +46,6 @@ class MyProject(FlowProject):
         sscript.writeline('set -u')
         # Exit on errors.
         sscript.writeline('set -e')
-        # Writing HOOMD_WALLTIME_STOP
-        # Does not hurt even if we don't use HOOMD-blue.
-        walltime_seconds = 24 * 3600 * walltime.days + walltime.seconds
-        sscript.writeline(
-            'export HOOMD_WALLTIME_STOP=$((`date +%s` + {}))'.format(
-                int(0.9 * walltime_seconds)))
         # Switch into the project root directory
         sscript.writeline('cd {}'.format(self.root_directory()))
         sscript.writeline()

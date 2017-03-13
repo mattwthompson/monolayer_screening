@@ -8,8 +8,6 @@ import environment
 
 
 def main(args):
-    args.mode = 'gpu' if args.gpu else 'cpu'
-
     env = environment.get_environment(test=args.test)
     if args.ppn is None:
         try:
@@ -29,10 +27,6 @@ if __name__ == '__main__':
     group = parser.add_argument_group(
         "Execution configuration:",
         "Specify the execution environment.")
-    group.add_argument(
-        '--gpu',
-        action='store_true',
-        help="Specify to use the GPU execution mode.")
     group.add_argument(
         '--np',
         type=int,

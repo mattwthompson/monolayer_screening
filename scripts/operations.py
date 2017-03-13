@@ -10,30 +10,47 @@ from util.hoomd import redirect_log, store_meta_data
 
 
 logger = logging.getLogger(__name__)
-STEPS = 5000
 
 
 def initialize(job):
+    from pkg_resources import resource_filename
+
+    from mbuild.lib.atoms import H
+
+    from atools.fileio import write_monolayer_ndx
+    from atools.lib.chains import Alkylsilane
+    from atools.recipes import SurfaceMonolayer
+    from atools.structure import identify_rigid_groups
     "Initialize the simulation configuration."
-    import hoomd
-    if hoomd.context.exec_conf is None:
-        hoomd.context.initialize('')
     with job:
-        with hoomd.context.SimulationContext():
-            n = ceil(pow(job.sp.N, 1/3))
-            assert n**3 == job.sp.N
-            hoomd.init.create_lattice(unitcell=hoomd.lattice.sc(a=1.0), n=n)
-            hoomd.dump.gsd('init.gsd', period=None, group=hoomd.group.all())
+        chainlength = job.sp.chainlength
+        n_chains = job.sp.n
+        seed = job.sp.seed
+        surface = job.sp.surface
+        terminal_group = job.sp.terminal_group
+
+        chain_proto = Alkylsilane(chain_length=chainlength, 
+                                  terminal_group=terminal_group)
+        monolayer = SurfaceMonolayer(surface=surface, chains=chain_proto,
+                                     n_chains=n_chains, seed=seed,
+                                     backfill=H())
+
+        forcefield_dir = resource_filename('atools', 'forcefields')
+        monolayer.save('init.gro', 
+            forcefield_files=os.path.join(forcefield_dir, 'oplsaa-silica.xml'))
+        monolayer.save('init.top', 
+            forcefield_files=os.path.join(forcefield_dir, 'oplsaa-silica.xml'))
+        rigid_groups = identify_rigid_groups(monolayer=monolayer, 
+            terminal_group=terminal_group, freeze_thickness=0.5)
+        write_monolayer_ndx(rigid_groups=rigid_groups, filename='init.ndx')
 
 
-def estimate(job):
-    "Ideal-gas estimate operation."
+def minimize(job):
+    "Energy minimization."
     sp = job.statepoint()
-    # Calculate volume using ideal gas law
-    V = sp['N'] * sp['kT'] / sp['p']
-    job.document['volume_estimate'] = V
 
 
+'''
 def sample(job):
     "Sample operation."
     import hoomd
@@ -62,6 +79,7 @@ def sample(job):
                     gsd_restart.write_restart()
                     job.document['sample_step'] = hoomd.get_step()
                     store_meta_data(job)
+'''
 
 
 def auto(job):
