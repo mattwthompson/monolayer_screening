@@ -18,17 +18,16 @@ logger = logging.getLogger(__name__)
 
 
 def initialize(job):
+    "Initialize the simulation configuration."
     from pkg_resources import resource_filename
 
     from mbuild.lib.atoms import H
 
     from atools.fileio import write_monolayer_ndx
     from atools.lib.chains import Alkylsilane
-    from atools.recipes import DualSurface
-    from atools.recipes import SilicaInterface
-    from atools.recipes import SurfaceMonolayer
+    from atools.recipes import DualSurface, SilicaInterface, SurfaceMonolayer
     from atools.structure import identify_rigid_groups
-    "Initialize the simulation configuration."
+
     with job:
         chainlength = job.statepoint()['chainlength']
         n_chains = job.statepoint()['n']
