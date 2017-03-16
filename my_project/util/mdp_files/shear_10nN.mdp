@@ -52,4 +52,4 @@ pull-coord2-type      = constant-force
 pull-coord2-geometry  = direction-periodic
 pull-coord2-vec       = 0.0 0.0 -1.0 ; normal force vector
 pull-coord2-groups    = 2 1
-pull-coord2-k         = 7500  ; normal force
+pull-coord2-k         = 6250  ; normal force

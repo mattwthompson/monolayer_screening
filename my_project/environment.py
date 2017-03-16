@@ -17,16 +17,6 @@ class RahmanEnvironment(flow.environment.TorqueEnvironment):
     cores_per_node = 16
 
     @classmethod
-    def grompp_cmd(cls, stage, _id):
-        return ('gmx grompp -f {stage}.mdp -c {name}.gro -p {name}.top'
-               '-n {name}.ndx -o {stage}.tpr'.format(stage=stage, name=_id))
-
-    @classmethod
-    def run_cmd(cls, stage):
-        return 'gmx mdrun -v -deffnm {stage} -ntmpi {cpn}'.format(stage=stage,
-                                                                  cpn=cores_per_node)
-
-    @classmethod
     def script(cls, _id, nn, walltime, ppn=None, **kwargs):
         if ppn is None:
             ppn = cls.cores_per_node

@@ -15,7 +15,7 @@ def main(args, random_seed):
     project = signac.init_project('MonolayerScreeningProject')
     statepoints_init = []
     for replication_index in range(args.num_replicas):
-        for terminal_group in ['aldehyde', 'cyclopropyl', 'nitro']:
+        for terminal_group in ['cyano', 'cyclopropyl', 'nitro']:
             for chainlength in np.linspace(6, 18, 3):
                 statepoint = dict(
                         # carbon backbone length
