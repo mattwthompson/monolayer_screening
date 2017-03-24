@@ -2,13 +2,13 @@ import getopt
 import os
 import sys
 
-from atools.structure import calc_nematic_order
+from atools.structure import calc_avg_tilt_angle
 import signac
 
 """
-Performs a nematic order calculation for each job in the project
+Performs a calculation of the average tilt angle for each job in the project
 
-Computes the nematic order of the top and bottom monolayers at each
+Computes the average tilt angle of the top and bottom monolayers at each
 timestep and prints the average to a text file. Requires an unwrapped
 trajectory. If an unwrapped trajectory is not found, one will be created.
 
@@ -22,8 +22,8 @@ Output Files
 ------------
 nvt-unwrapped.xtc : Unwrapped equilibration trajectory
 
-nematic-order.txt : Average nematic order of the top and bottom
-                    monolayers at each timestep.
+avg-tilt-angle.txt : Average nematic order of the top and bottom
+                     monolayers at each timestep.
 
 """
 
@@ -33,7 +33,7 @@ project = signac.get_project()
 
 for job in project.find_jobs():
     gro_file = os.path.join(job.workspace(), 'nvt.gro')
-    out_file = os.path.join(job.workspace(), 'nematic-order.txt')
+    out_file = os.path.join(job.workspace(), 'avg-tilt-angle.txt')
     if '-a' not in opts[0] and os.path.isfile(out_file):
         continue
     elif os.path.isfile(gro_file):
