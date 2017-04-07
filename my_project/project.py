@@ -10,13 +10,13 @@ class MyProject(FlowProject):
     def classify(self, job):
         if job.isfile('init.top'):
             yield 'initialized'
-        if job.isfile('em_terminal.gro'):
+        if job.isfile('em_phenyls.gro'):
             yield 'fixed_overlaps'
         if job.isfile('em.gro'):
             yield 'minimized'
         if job.isfile('nvt.gro'):
             yield 'equilibrated'
-        for load in [5, 10, 15, 20, 25]:
+        for load in [5, 15, 25, 10, 20]:
             if job.isfile('shear_{}nN.gro'.format(load)):
                 yield 'sheared at {}nN'.format(load)
 
@@ -34,7 +34,7 @@ class MyProject(FlowProject):
             return op('minimize')
         if 'equilibrated' not in labels:
             return op('equilibrate')
-        for load in [5, 10, 15, 20, 25]:
+        for load in [5, 15, 25, 10, 20]:
             if 'sheared at {}nN'.format(load) not in labels:
                 return op('shear_{}nN'.format(load))
 
@@ -63,7 +63,7 @@ class MyProject(FlowProject):
         # Exit on errors.
         sscript.writeline('set -e')
         # Import gromacs
-        sscript.writeline('module load gromacs/5.1.4')
+        sscript.writeline('module load gromacs')
         # Switch into the project root directory
         sscript.writeline('cd {}'.format(self.root_directory()))
         sscript.writeline()

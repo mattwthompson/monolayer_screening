@@ -18,6 +18,7 @@ def main(args):
                 "Please provide `--ppn` argument")
 
     project = get_project()
+    env.scheduler = env.get_scheduler()
     project.submit(env, **vars(args))
 
 

@@ -24,7 +24,7 @@ def initialize(job):
     from mbuild.lib.atoms import H
 
     from atools.fileio import write_monolayer_ndx
-    from atools.lib.chains import Alkylsilane
+    from atools.lib.chains.alkylsilane_internal import Alkylsilane
     from atools.recipes import DualSurface, SilicaInterface, SurfaceMonolayer
     from atools.structure import identify_rigid_groups
 
@@ -32,11 +32,12 @@ def initialize(job):
         chainlength = job.statepoint()['chainlength']
         n_chains = job.statepoint()['n']
         seed = job.statepoint()['seed']
-        terminal_group = job.statepoint()['terminal_group']
+        phenyl_position = job.statepoint()['phenyl_position']
 
         surface = SilicaInterface(thickness=1.2, seed=seed)
         chain_proto = Alkylsilane(chain_length=chainlength, 
-                                  terminal_group=terminal_group)
+                                  internal_group='phenyl',
+                                  locations=phenyl_position)
         monolayer = SurfaceMonolayer(surface=surface, chains=chain_proto,
                                      n_chains=n_chains, seed=seed,
                                      backfill=H())
@@ -52,23 +53,23 @@ def initialize(job):
             forcefield_files=os.path.join(forcefield_dir, 'oplsaa-silica.xml'),
             overwrite=True)
         rigid_groups = identify_rigid_groups(monolayer=dual_monolayer, 
-            terminal_group=terminal_group, freeze_thickness=0.5)
+            rigid_group=rigid_group, freeze_thickness=0.5)
         write_monolayer_ndx(rigid_groups=rigid_groups, filename='init.ndx')
 
 @job_chdir
 def fix_overlaps(job):
-    "Initial minimization to fix overlaps between terminal groups."
-    grompp = _grompp_str(job, 'em_terminal', 'init', 'init')
+    "Initial minimization to fix overlaps between phenyl groups."
+    grompp = _grompp_str(job, 'em_phenyls', 'init', 'init')
     grompp_proc = subprocess.Popen(grompp.split())
     grompp_proc.communicate()
-    mdrun = _mdrun_str(job, 'em_terminal')
+    mdrun = _mdrun_str(job, 'em_phenyls')
     mdrun_proc = subprocess.Popen(mdrun.split())
     mdrun_proc.communicate()
 
 @job_chdir
 def minimize(job):
     "Energy minimize."
-    grompp = _grompp_str(job, 'em', 'em_terminal', 'init')
+    grompp = _grompp_str(job, 'em', 'em_phenyls', 'init')
     grompp_proc = subprocess.Popen(grompp.split())
     grompp_proc.communicate()
     mdrun = _mdrun_str(job, 'em')

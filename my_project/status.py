@@ -15,7 +15,7 @@ def main(args):
 
     project = get_project()
     with Pool() as pool:
-        project.print_status(scheduler, pool=pool, **vars(args))
+        project.print_status(None, pool=pool, **vars(args))
 
 
 if __name__ == '__main__':

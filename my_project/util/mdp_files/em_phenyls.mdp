@@ -13,5 +13,5 @@ rvdw		    = 1.0		; Short-range Van der Waals cut-off
 pbc		        = xyz 		; Periodic Boundary Conditions (yes/no)
 periodic-molecules = yes 	; periodic amorphous silica
 
-freezegrps = nonterminal
+freezegrps = nonphenyl
 freezedim = Y Y Y
