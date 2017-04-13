@@ -4,6 +4,8 @@ from math import ceil
 from flow import FlowProject
 from flow import JobOperation
 
+import operations
+
 
 class MyProject(FlowProject):
 
@@ -15,7 +17,8 @@ class MyProject(FlowProject):
         labels = set(self.classify(job))
 
         def op(name):
-            return JobOperation(name, job, 'python scripts/run.py {} {}'.format(name, job))
+            operation = getattr(operations, name)
+            return JobOperation(name, job, '{}'.format(operation(job)))
 
         if 'gromppd' not in labels:
             return op('grompp')

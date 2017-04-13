@@ -4,24 +4,16 @@ Functions defined in this module can be executed using the
 :py:mod:`.run` module.
 """
 import logging
-from math import ceil
-import os
-import subprocess
 
 import numpy as np
-
-from util.decorators import job_chdir
-from util.hoomd import redirect_log, store_meta_data
 
 
 logger = logging.getLogger(__name__)
 
-@job_chdir
 def grompp(job):
     "Create a TPR file for ethane."
-    grompp = _grompp_str(job, 'minimize', 'ethane', 'ethane')
-    grompp_proc = subprocess.Popen(grompp.split())
-    grompp_proc.communicate()
+    grompp_str = _grompp_str(job, 'minimize', 'ethane', 'ethane')
+    return grompp_str
 
 def auto(job):
     "This is a meta-operation to execute multiple operations."
@@ -42,7 +34,7 @@ def auto(job):
 
 def _grompp_str(job, op_name, gro_name, sys_name):
     """Helper function, returns grompp command string for operation """
-    grompp_str = ('aprun gmx_mpi grompp -f {0}/scripts/util/{1}.mdp -c '
+    grompp_str = ('gmx_mpi grompp -f {0}/scripts/util/{1}.mdp -c '
                   '{0}/scripts/util/{3}.gro -p {0}/scripts/util/{4}.top -o '
                   '{2}/{1}.tpr'.format(job._project.root_directory(), op_name, 
                   job.workspace(), gro_name, sys_name))
