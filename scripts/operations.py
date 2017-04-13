@@ -22,9 +22,6 @@ def grompp(job):
     grompp = _grompp_str(job, 'minimize', 'ethane', 'ethane')
     grompp_proc = subprocess.Popen(grompp.split())
     grompp_proc.communicate()
-    mdrun = _mdrun_str(job, 'minimize')
-    mdrun_proc = subprocess.Popen(mdrun.split())
-    mdrun_proc.communicate()
 
 def auto(job):
     "This is a meta-operation to execute multiple operations."
