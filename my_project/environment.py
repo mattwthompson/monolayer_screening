@@ -12,20 +12,19 @@ from flow.environment import format_timedelta
 __all__ = ['get_environment']
 
 
-class RahmanEnvironment(flow.environment.TorqueEnvironment):
-    hostname_pattern = 'master.cl.vanderbilt.edu'
+class TitanEnvironment(flow.environment.MoabEnvironment):
+    hostname_pattern = 'titan'
     cores_per_node = 16
 
     @classmethod
-    def script(cls, _id, nn, walltime, ppn=None, **kwargs):
-        if ppn is None:
-            ppn = cls.cores_per_node
-        js = super(RahmanEnvironment, cls).script()
+    def script(cls, _id, nn, walltime, **kwargs):
+        js = super(TitanEnvironment, cls).script()
         js.writeline('#!/bin/sh -l')
-        js.writeline('#PBS -j oe')
-        js.writeline('#PBS -l nodes={}:ppn={}'.format(nn, ppn))
-        js.writeline('#PBS -l walltime={}'.format(format_timedelta(walltime)))
-        js.writeline('#PBS -q low')
         js.writeline('#PBS -N {}'.format(_id))
+        js.writeline('#PBS -A MAT149')
+        js.writeline('#PBS -q debug') # Comment this out for production runs
+        js.writeline('#PBS -l nodes={}'.format(nn))
+        js.writeline('#PBS -l walltime={}'.format(format_timedelta(walltime)))
+        js.writeline('#PBS -j oe')
         js.writeline('#PBS -V')
         return js
