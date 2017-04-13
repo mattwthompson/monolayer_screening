@@ -22,9 +22,6 @@ def grompp(job):
     grompp = _grompp_str(job, 'minimize', 'ethane', 'ethane')
     grompp_proc = subprocess.Popen(grompp.split())
     grompp_proc.communicate()
-    mdrun = _mdrun_str(job, 'minimize')
-    mdrun_proc = subprocess.Popen(mdrun.split())
-    mdrun_proc.communicate()
 
 def auto(job):
     "This is a meta-operation to execute multiple operations."
@@ -45,8 +42,8 @@ def auto(job):
 
 def _grompp_str(job, op_name, gro_name, sys_name):
     """Helper function, returns grompp command string for operation """
-    grompp_str = ('aprun gmx grompp -f {0}/scripts/util/{1}.mdp -c {2}/{3}.gro '
-                  '-p {2}/{4}.top -o {2}/{1}.tpr'
-                  ''.format(job._project.root_directory(), op_name, job.workspace(), 
-                  gro_name, sys_name))
+    grompp_str = ('aprun gmx_mpi grompp -f {0}/scripts/util/{1}.mdp -c '
+                  '{0}/scripts/util/{3}.gro -p {0}/scripts/util/{4}.top -o '
+                  '{2}/{1}.tpr'.format(job._project.root_directory(), op_name, 
+                  job.workspace(), gro_name, sys_name))
     return grompp_str
